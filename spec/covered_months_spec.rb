@@ -1,4 +1,5 @@
 require "spec_helper"
+require 'benchmark'
 
 describe CoveredMonths do
   let(:start_date) { Date.civil(2016, 1, 1) }
@@ -68,5 +69,4 @@ describe CoveredMonths do
       expect(covered_months.count).to eq(4.0)
     end
   end
-
 end

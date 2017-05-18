@@ -1,13 +1,17 @@
 require 'kl/date_range'
 require 'set'
+require_relative 'cache'
+require 'pp'
 
 module CoveredMonths
   class Base
     attr_reader :date_segments, :base_date_segment
+    attr_accessor :cache_enable
 
-    def initialize(date_segments:, base_date_segment:)
+    def initialize(date_segments:, base_date_segment:, cache_enable: false)
       @date_segments     = date_segments
       @base_date_segment = base_date_segment
+      @cached            = cache_enable
     end
 
     def count
@@ -30,10 +34,20 @@ module CoveredMonths
     end
 
     def dates
-      @range_dates ||= truncated_date_segments.inject([]) { |a, segment| a.concat(KL::DateRange(segment).every(:days => 1)) }
+      @range_dates ||= truncated_date_segments.inject([]) { |a, segment| a.concat(segment_dates(segment)) }
     end
 
     private
+
+    def segment_dates(segment)
+      if cache_enable
+        key = segment.to_yaml
+        load_from_cache(key)
+      else
+        KL::DateRange(segment).every(:days => 1)
+      end
+
+    end
 
     def truncated_date_segments
       date_segments.map do |segment|
@@ -48,7 +62,24 @@ module CoveredMonths
     end
 
     def base_date_segment_dates
-      KL::DateRange(base_date_segment).every(:days => 1)
+      if cache_enable
+        key = base_date_segment.to_yaml
+        load_from_cache(key)
+      else
+        KL::DateRange(base_date_segment).every(:days => 1)
+      end
+    end
+
+    def load_from_cache(key)
+      cached_record = Cache.find(key: key)
+      if cached_record.nil?
+        range = YAML::load(key)
+        value = KL::DateRange(range).every(:days => 1)
+        Cache.create(key: key, value: value.to_yaml)
+        value
+      else
+        YAML::load(cached_record.value)
+      end
     end
   end
 end
