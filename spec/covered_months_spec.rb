@@ -42,4 +42,17 @@ describe CoveredMonths do
       expect(covered_months.count).to eq(0.5)
     end
   end
+
+  context 'multiple segments coverage' do
+    let(:dates) { build(:multiple_segments_member).dates }
+    let(:covered_months) { CoveredMonths.create(dates: dates, date_range: (start_date..end_date)) }
+
+    it '#range_dates' do
+      expect(covered_months.range_dates.size).to eq(30)
+    end
+
+    it "#count" do
+      expect(covered_months.count).to eq(1.0)
+    end
+  end
 end

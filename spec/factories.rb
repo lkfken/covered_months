@@ -13,4 +13,8 @@ FactoryGirl.define do
     dates [Date.civil(2016, 4, 1)..Date.civil(2016, 4, 15)]
   end
 
+  factory :multiple_segments_member, class: OpenStruct do
+    dates [Date.civil(2016, 4, 1)..Date.civil(2016, 4, 15),
+           Date.civil(2016, 6, 1)..Date.civil(2016, 6, 15)]
+  end
 end
