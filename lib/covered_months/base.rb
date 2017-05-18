@@ -11,14 +11,14 @@ module CoveredMonths
     end
 
     def count
-      value.map do |month, day_count|
+      to_hash.map do |month, day_count|
         base_month = Date.parse(month+'01')
         month_days = base_month.end_of_month.day
         Rational(day_count, month_days)
       end.inject(0.0) { |sum, frac| sum += frac }
     end
 
-    def value
+    def to_hash
       @value ||= begin
         days_within_base.inject(Hash.new) do |hsh, date|
           key      = date.strftime('%Y%m')
@@ -29,7 +29,7 @@ module CoveredMonths
       end
     end
 
-    def range_dates
+    def dates
       @range_dates ||= begin
         date_segments.inject([]) do |a, segment|
           segment = (base_date_segment.begin..segment.end) if segment.begin < base_date_segment.begin
@@ -42,10 +42,10 @@ module CoveredMonths
     private
 
     def days_within_base
-      base_date_segment_days & range_dates
+      base_date_segment_dates & dates
     end
 
-    def base_date_segment_days
+    def base_date_segment_dates
       KL::DateRange(base_date_segment).every(:days => 1)
     end
   end
