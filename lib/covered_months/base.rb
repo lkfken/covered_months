@@ -20,7 +20,7 @@ module CoveredMonths
 
     def to_hash
       @value ||= begin
-        days_within_base.inject(Hash.new) do |hsh, date|
+        dates_within_base.inject(Hash.new) do |hsh, date|
           key      = date.strftime('%Y%m')
           hsh[key] ||= 0
           hsh[key] += 1
@@ -30,18 +30,20 @@ module CoveredMonths
     end
 
     def dates
-      @range_dates ||= begin
-        date_segments.inject([]) do |a, segment|
-          segment = (base_date_segment.begin..segment.end) if segment.begin < base_date_segment.begin
-          segment = (segment.begin..base_date_segment.end) if segment.end > base_date_segment.end
-          a.concat(KL::DateRange(segment).every(:days => 1))
-        end
-      end
+      @range_dates ||= truncated_date_segments.inject([]) { |a, segment| a.concat(KL::DateRange(segment).every(:days => 1)) }
     end
 
     private
 
-    def days_within_base
+    def truncated_date_segments
+      date_segments.map do |segment|
+        segment = (base_date_segment.begin..segment.end) if segment.begin < base_date_segment.begin
+        segment = (segment.begin..base_date_segment.end) if segment.end > base_date_segment.end
+        segment
+      end
+    end
+
+    def dates_within_base
       base_date_segment_dates & dates
     end
 
