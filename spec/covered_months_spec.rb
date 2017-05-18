@@ -5,8 +5,8 @@ describe CoveredMonths do
   let(:end_date) { Date.civil(2016, 12, 31) }
 
   context 'active coverage' do
-    let(:dates) { build(:active_member).dates }
-    let(:covered_months) { CoveredMonths.create(dates: dates, date_range: (start_date..end_date)) }
+    let(:date_segments) { build(:active_member).dates }
+    let(:covered_months) { CoveredMonths.create(date_segments: date_segments, base_date_segment: (start_date..end_date)) }
 
     it '#range_dates' do
       expect(covered_months.range_dates.size).to eq(366)
@@ -18,8 +18,8 @@ describe CoveredMonths do
   end
 
   context 'no complete coverage' do
-    let(:dates) { build(:mid_year_member).dates }
-    let(:covered_months) { CoveredMonths.create(dates: dates, date_range: (start_date..end_date)) }
+    let(:date_segments) { build(:mid_year_member).dates }
+    let(:covered_months) { CoveredMonths.create(date_segments: date_segments, base_date_segment: (start_date..end_date)) }
 
     it '#range_dates' do
       expect(covered_months.range_dates.size).to eq(121)
@@ -31,8 +31,8 @@ describe CoveredMonths do
   end
 
   context 'partial month coverage' do
-    let(:dates) { build(:partial_month_member).dates }
-    let(:covered_months) { CoveredMonths.create(dates: dates, date_range: (start_date..end_date)) }
+    let(:date_segments) { build(:partial_month_member).dates }
+    let(:covered_months) { CoveredMonths.create(date_segments: date_segments, base_date_segment: (start_date..end_date)) }
 
     it '#range_dates' do
       expect(covered_months.range_dates.size).to eq(15)
@@ -44,8 +44,8 @@ describe CoveredMonths do
   end
 
   context 'multiple segments coverage' do
-    let(:dates) { build(:multiple_segments_member).dates }
-    let(:covered_months) { CoveredMonths.create(dates: dates, date_range: (start_date..end_date)) }
+    let(:date_segments) { build(:multiple_segments_member).dates }
+    let(:covered_months) { CoveredMonths.create(date_segments: date_segments, base_date_segment: (start_date..end_date)) }
 
     it '#range_dates' do
       expect(covered_months.range_dates.size).to eq(30)
